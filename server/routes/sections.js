@@ -51,7 +51,9 @@ router.put('/:id', async (req, res) => {
     section.color = color ?? section.color;
 
     const updated = await section.save();
-    res.json({ success: true, data: updated });
+    const subsectionCount = await Subsection.countDocuments({ sectionId: updated._id });
+    const bookmarkCount = await Bookmark.countDocuments({ sectionId: updated._id });
+    res.json({ success: true, data: { ...updated.toObject(), subsectionCount, bookmarkCount } });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
