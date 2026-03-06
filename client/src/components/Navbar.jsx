@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/authSlice';
+import api from '../api/axios';
 
 const S = {
   nav: {
@@ -108,7 +109,8 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { user, token } = useSelector((s) => s.auth);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try { await api.post('/auth/logout'); } catch (_) {}
     dispatch(logout());
     navigate('/login');
   };
