@@ -14,7 +14,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.get('/api/health', (req, res) => res.json({ success: true, message: 'Server is running' }));
+app.get('/', (req, res) => res.json({ success: true, message: 'Server is running' }));
 
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/sections', require('./routes/sections'));
