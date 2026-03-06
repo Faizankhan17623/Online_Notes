@@ -16,39 +16,53 @@ export default function Login() {
   }, [token]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-10 relative overflow-hidden"
-      style={{ background: '#070d1a' }}>
-      {/* Orbs */}
-      <div className="bg-orb w-80 h-80 sm:w-[500px] sm:h-[500px]"
-        style={{ background: 'rgba(79,70,229,0.18)', top: '-100px', left: '-100px' }} />
-      <div className="bg-orb w-64 h-64 sm:w-96 sm:h-96"
-        style={{ background: 'rgba(124,58,237,0.12)', bottom: '-60px', right: '-60px' }} />
+    <div style={{
+      minHeight: 'calc(100vh - 56px)',
+      background: '#0f172a',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '2rem 1rem',
+    }}>
+      <div style={{ width: '100%', maxWidth: '420px' }}>
 
-      <div className="w-full max-w-md relative z-10">
         {/* Brand */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl text-2xl mb-4 shadow-2xl"
-            style={{ background: 'linear-gradient(135deg,#4f46e5,#7c3aed)', boxShadow: '0 8px 32px rgba(99,102,241,0.4)' }}>
-            🔗
-          </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">LinkVault</h1>
-          <p className="text-slate-500 mt-1.5 text-sm">Welcome back — sign in to continue</p>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <div style={{
+            width: '52px', height: '52px', borderRadius: '14px',
+            background: '#6366f1', display: 'flex', alignItems: 'center',
+            justifyContent: 'center', fontSize: '1.5rem',
+            margin: '0 auto 0.875rem', boxShadow: '0 8px 24px rgba(99,102,241,0.4)',
+          }}>🔗</div>
+          <h1 style={{ fontSize: '1.625rem', fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.02em' }}>
+            LinkVault
+          </h1>
+          <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.375rem' }}>
+            Welcome back — sign in to continue
+          </p>
         </div>
 
         {/* Card */}
-        <div className="glass-card p-6 sm:p-8" style={{ boxShadow: '0 24px 64px rgba(0,0,0,0.5)' }}>
-          <h2 className="text-white font-bold text-xl mb-5">Sign In</h2>
+        <div className="card" style={{ padding: '2rem' }}>
+          <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '1.5rem' }}>
+            Sign In
+          </h2>
 
           {error && (
-            <div className="flex items-start gap-2 text-red-400 text-sm p-3 rounded-xl mb-4"
-              style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
-              ⚠️ {error}
+            <div style={{
+              background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)',
+              borderRadius: '6px', padding: '0.75rem 1rem',
+              color: '#fca5a5', fontSize: '0.875rem', marginBottom: '1.25rem',
+            }}>
+              {error}
             </div>
           )}
 
-          <form onSubmit={(e) => { e.preventDefault(); dispatch(loginUser(form)); }} className="flex flex-col gap-4">
-            <div>
-              <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1.5">Email</label>
+          <form onSubmit={(e) => { e.preventDefault(); dispatch(loginUser(form)); }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                Email
+              </label>
               <input
                 type="email"
                 placeholder="you@example.com"
@@ -59,9 +73,11 @@ export default function Login() {
               />
             </div>
 
-            <div>
-              <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1.5">Password</label>
-              <div className="relative">
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                Password
+              </label>
+              <div style={{ position: 'relative' }}>
                 <input
                   type={showPass ? 'text' : 'password'}
                   placeholder="Your password"
@@ -71,26 +87,28 @@ export default function Login() {
                   className="input"
                   style={{ paddingRight: '2.75rem' }}
                 />
-                <button type="button" onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors text-sm">
+                <button
+                  type="button"
+                  onClick={() => setShowPass(!showPass)}
+                  style={{
+                    position: 'absolute', right: '0.75rem', top: '50%',
+                    transform: 'translateY(-50%)', background: 'none',
+                    border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '1rem',
+                  }}
+                >
                   {showPass ? '🙈' : '👁️'}
                 </button>
               </div>
             </div>
 
-            <button type="submit" disabled={loading} className="btn-primary mt-1" style={{ padding: '0.875rem' }}>
-              {loading
-                ? <span className="flex items-center justify-center gap-2">
-                    <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin inline-block" />
-                    Signing in...
-                  </span>
-                : 'Sign In →'}
+            <button type="submit" disabled={loading} className="btn-primary">
+              {loading ? 'Signing in...' : 'Sign In →'}
             </button>
           </form>
 
-          <p className="text-slate-500 text-sm text-center mt-5">
+          <p style={{ textAlign: 'center', color: '#64748b', fontSize: '0.875rem', marginTop: '1.25rem' }}>
             No account?{' '}
-            <Link to="/register" className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors">
+            <Link to="/register" style={{ color: '#818cf8', fontWeight: 600, textDecoration: 'none' }}>
               Create one free
             </Link>
           </p>

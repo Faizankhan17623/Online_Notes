@@ -13,7 +13,7 @@ export default defineConfig({
         name: 'LinkVault',
         short_name: 'LinkVault',
         description: 'Your personal URL Bookmark Manager',
-        theme_color: '#1e3a5f',
+        theme_color: '#6366f1',
         background_color: '#0f172a',
         display: 'standalone',
         start_url: '/',

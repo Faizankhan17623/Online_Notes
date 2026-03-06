@@ -4,85 +4,110 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { fetchBookmarks, addBookmark, updateBookmark, deleteBookmark } from '../store/bookmarkSlice';
 import { fetchSections } from '../store/sectionSlice';
 import { fetchSubsections } from '../store/subsectionSlice';
-import SearchBar from '../components/SearchBar';
 
 function BookmarkCard({ bookmark, color }) {
   const dispatch = useDispatch();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
-    title: bookmark.title, url: bookmark.url,
-    description: bookmark.description, tags: bookmark.tags.join(', '),
+    title: bookmark.title,
+    url: bookmark.url,
+    description: bookmark.description,
+    tags: bookmark.tags.join(', '),
   });
+
+  useEffect(() => {
+    if (!editing) {
+      setForm({ title: bookmark.title, url: bookmark.url, description: bookmark.description, tags: bookmark.tags.join(', ') });
+    }
+  }, [bookmark, editing]);
 
   const handleSave = () => {
     dispatch(updateBookmark({ id: bookmark._id, ...form, tags: form.tags.split(',').map(t => t.trim()).filter(Boolean) }));
     setEditing(false);
   };
 
-  if (editing) return (
-    <div className="flex flex-col gap-3 p-4 rounded-2xl"
-      style={{ background: 'rgba(15,23,42,0.9)', border: `1px solid ${color}50` }}>
-      <input className="input" style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem' }}
-        value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Title" />
-      <input className="input" style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem' }}
-        value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} placeholder="URL" />
-      <textarea className="input" rows={2} style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', resize: 'none' }}
-        value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Description" />
-      <input className="input" style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem' }}
-        value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} placeholder="Tags (comma separated)" />
-      <div className="flex gap-2">
-        <button onClick={handleSave} className="flex-1 text-white text-xs font-semibold py-2 rounded-lg transition-opacity hover:opacity-90"
-          style={{ background: color }}>Save</button>
-        <button onClick={() => setEditing(false)} className="flex-1 text-slate-400 text-xs py-2 rounded-lg transition-colors hover:text-white"
-          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>Cancel</button>
+  if (editing) {
+    return (
+      <div style={{
+        background: '#1e293b', border: `1px solid ${color}`,
+        borderRadius: '10px', padding: '1rem',
+        display: 'flex', flexDirection: 'column', gap: '0.625rem',
+      }}>
+        <input className="input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Title" />
+        <input className="input" value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} placeholder="URL" />
+        <textarea className="input" rows={2} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Description" style={{ resize: 'none' }} />
+        <input className="input" value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} placeholder="Tags (comma separated)" />
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button onClick={handleSave} style={{ flex: 1, padding: '0.5rem', background: color, border: 'none', borderRadius: '6px', color: '#fff', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'inherit' }}>Save</button>
+          <button onClick={() => setEditing(false)} style={{ flex: 1, padding: '0.5rem', background: '#0f172a', border: '1px solid #334155', borderRadius: '6px', color: '#94a3b8', fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'inherit' }}>Cancel</button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
-    <div className="flex flex-col rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-0.5 group"
-      style={{ background: 'rgba(15,23,42,0.75)', border: '1px solid rgba(148,163,184,0.1)', boxShadow: '0 2px 12px rgba(0,0,0,0.3)' }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(148,163,184,0.2)'}
-      onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(148,163,184,0.1)'}>
+    <div style={{
+      background: '#1e293b', border: '1px solid #334155',
+      borderRadius: '10px', overflow: 'hidden',
+      display: 'flex', flexDirection: 'column',
+    }}>
+      {/* Color accent bar */}
       <div style={{ height: '3px', background: color, flexShrink: 0 }} />
-      <div className="flex flex-col gap-3 p-4 flex-1">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-white font-semibold text-sm leading-snug flex-1"
-            style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+
+      <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1 }}>
+        {/* Title + actions */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
+          <h3 style={{
+            color: '#f1f5f9', fontWeight: 600, fontSize: '0.875rem',
+            lineHeight: 1.4, flex: 1,
+            overflow: 'hidden', display: '-webkit-box',
+            WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+          }}>
             {bookmark.title}
           </h3>
-          <div className="flex gap-1 shrink-0">
-            <button onClick={() => setEditing(true)}
-              className="w-7 h-7 flex items-center justify-center rounded-lg text-xs text-slate-500 hover:text-white transition-colors"
-              style={{ background: 'rgba(255,255,255,0.05)' }}>✏️</button>
-            <button onClick={() => { if (window.confirm('Delete?')) dispatch(deleteBookmark(bookmark._id)); }}
-              className="w-7 h-7 flex items-center justify-center rounded-lg text-xs text-slate-500 hover:text-red-400 transition-colors"
-              style={{ background: 'rgba(255,255,255,0.05)' }}>🗑️</button>
+          <div style={{ display: 'flex', gap: '0.25rem', flexShrink: 0 }}>
+            <button
+              onClick={() => setEditing(true)}
+              style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a', border: '1px solid #334155', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem' }}
+            >✏️</button>
+            <button
+              onClick={() => { if (window.confirm('Delete?')) dispatch(deleteBookmark(bookmark._id)); }}
+              style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a', border: '1px solid #334155', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem' }}
+            >🗑️</button>
           </div>
         </div>
 
+        {/* Description */}
         {bookmark.description && (
-          <p className="text-slate-500 text-xs leading-relaxed"
-            style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          <p style={{
+            color: '#64748b', fontSize: '0.8rem', lineHeight: 1.5,
+            overflow: 'hidden', display: '-webkit-box',
+            WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+          }}>
             {bookmark.description}
           </p>
         )}
 
+        {/* Tags */}
         {bookmark.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem' }}>
             {bookmark.tags.slice(0, 4).map(tag => (
               <span key={tag} className="tag-pill">#{tag}</span>
             ))}
           </div>
         )}
 
-        <div className="flex items-center gap-2 mt-auto pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <a href={bookmark.url} target="_blank" rel="noopener noreferrer"
-            className="flex-1 text-center text-white text-xs font-semibold py-2 rounded-lg transition-opacity hover:opacity-85"
-            style={{ background: color }}>
-            Visit Link ↗
+        {/* Footer */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: 'auto', paddingTop: '0.75rem', borderTop: '1px solid #334155' }}>
+          <a
+            href={bookmark.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ flex: 1, textAlign: 'center', background: color, color: '#fff', fontSize: '0.8rem', fontWeight: 600, padding: '0.45rem', borderRadius: '6px', textDecoration: 'none' }}
+          >
+            Visit ↗
           </a>
-          <span className="text-slate-600 text-xs shrink-0">
+          <span style={{ color: '#475569', fontSize: '0.75rem', flexShrink: 0 }}>
             {new Date(bookmark.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
           </span>
         </div>
@@ -101,19 +126,28 @@ export default function SubsectionPage() {
   const { token } = useSelector((s) => s.auth);
 
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', url: '', description: '', tags: '' });
 
   const section = sections.find(s => s._id === sectionId);
   const subsection = subsections.find(s => s._id === subsectionId);
-  const color = section?.color || '#4f46e5';
+  const color = section?.color || '#6366f1';
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 350);
+    return () => clearTimeout(t);
+  }, [search]);
 
   useEffect(() => {
     if (!token) { navigate('/login'); return; }
-    dispatch(fetchBookmarks({ subsectionId, search }));
-    if (sections.length === 0) dispatch(fetchSections());
-    if (subsections.length === 0) dispatch(fetchSubsections(sectionId));
-  }, [token, subsectionId, search]);
+    dispatch(fetchBookmarks({ subsectionId, search: debouncedSearch }));
+  }, [token, subsectionId, debouncedSearch, dispatch, navigate]);
+
+  useEffect(() => {
+    dispatch(fetchSections());
+    dispatch(fetchSubsections(sectionId));
+  }, [sectionId, dispatch]);
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -127,95 +161,110 @@ export default function SubsectionPage() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden" style={{ background: '#070d1a' }}>
-      <div className="bg-orb w-80 h-80" style={{ background: color + '15', top: '-60px', right: '-60px' }} />
-
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+    <div style={{ minHeight: 'calc(100vh - 56px)', background: '#0f172a', padding: '2rem 1.5rem' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
 
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs text-slate-500 mb-5 flex-wrap">
-          <button onClick={() => navigate('/')} className="hover:text-white transition-colors">Vault</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem', fontSize: '0.875rem', color: '#64748b', flexWrap: 'wrap' }}>
+          <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'inherit' }}>Vault</button>
           <span>›</span>
-          <button onClick={() => navigate(`/section/${sectionId}`)} className="hover:text-white transition-colors">{section?.name}</button>
+          <button onClick={() => navigate(`/section/${sectionId}`)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'inherit' }}>
+            {section?.name || 'Section'}
+          </button>
           <span>›</span>
-          <span className="text-white">{subsection?.name}</span>
+          <span style={{ color: '#e2e8f0' }}>{subsection?.name || 'Subsection'}</span>
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
-          <div className="flex items-center gap-3">
-            <button onClick={() => navigate(`/section/${sectionId}`)}
-              className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-white transition-colors shrink-0"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>←</button>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
+            <button
+              onClick={() => navigate(`/section/${sectionId}`)}
+              style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#94a3b8', cursor: 'pointer', fontSize: '1.1rem', flexShrink: 0 }}
+            >←</button>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white">{subsection?.name || 'Subsection'}</h1>
-              <p className="text-slate-500 text-sm">{bookmarks.length} link{bookmarks.length !== 1 ? 's' : ''}</p>
+              <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#f1f5f9' }}>
+                {subsection?.name || 'Subsection'}
+              </h1>
+              <p style={{ color: '#64748b', fontSize: '0.875rem' }}>
+                {bookmarks.length} link{bookmarks.length !== 1 ? 's' : ''}
+              </p>
             </div>
           </div>
-          <button onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all hover:-translate-y-0.5"
-            style={{ background: color, boxShadow: `0 4px 16px ${color}50` }}>
+          <button
+            onClick={() => setShowForm(true)}
+            style={{ padding: '0.5rem 1.125rem', background: color, border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', boxShadow: `0 4px 12px ${color}50` }}
+          >
             + Add Link
           </button>
         </div>
 
-        {/* Add bookmark form */}
+        {/* Add form */}
         {showForm && (
-          <div className="glass-card p-5 mb-6" style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
-            <h3 className="text-white font-semibold mb-4">Add New Link</h3>
-            <form onSubmit={handleAdd} className="flex flex-col gap-3">
-              <input className="input" placeholder="Title *" value={form.title}
-                onChange={e => setForm({ ...form, title: e.target.value })} required autoFocus />
-              <input className="input" type="url" placeholder="URL * (https://...)" value={form.url}
-                onChange={e => setForm({ ...form, url: e.target.value })} required />
-              <textarea className="input" rows={2} placeholder="Description (optional)"
-                value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-                style={{ resize: 'none' }} />
-              <input className="input" placeholder="Tags: ml, tutorial, paper (comma separated)"
-                value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} />
-              <div className="flex gap-2 mt-1">
-                <button type="submit"
-                  className="flex-1 text-white text-sm font-semibold py-2.5 rounded-xl transition-opacity hover:opacity-90"
-                  style={{ background: color }}>Save Link</button>
-                <button type="button" onClick={() => setShowForm(false)}
-                  className="flex-1 text-slate-400 text-sm py-2.5 rounded-xl transition-colors hover:text-white"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>Cancel</button>
+          <div className="card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
+            <h3 style={{ color: '#f1f5f9', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.75rem' }}>Add New Link</h3>
+            <form onSubmit={handleAdd} style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+              <input className="input" placeholder="Title *" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required autoFocus />
+              <input className="input" type="url" placeholder="URL * (https://...)" value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} required />
+              <textarea className="input" rows={2} placeholder="Description (optional)" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} style={{ resize: 'none' }} />
+              <input className="input" placeholder="Tags: ml, tutorial (comma separated)" value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} />
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
+                <button type="submit" style={{ flex: 1, padding: '0.6rem', background: color, border: 'none', borderRadius: '6px', color: '#fff', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', fontFamily: 'inherit' }}>Save Link</button>
+                <button type="button" onClick={() => setShowForm(false)} style={{ flex: 1, padding: '0.6rem', background: '#0f172a', border: '1px solid #334155', borderRadius: '6px', color: '#94a3b8', fontSize: '0.875rem', cursor: 'pointer', fontFamily: 'inherit' }}>Cancel</button>
               </div>
             </form>
           </div>
         )}
 
         {/* Search */}
-        <div className="mb-6">
-          <SearchBar value={search} onChange={setSearch} />
+        <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
+          <span style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: '#475569', pointerEvents: 'none', fontSize: '1rem' }}>🔍</span>
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search by title, description or tag..."
+            className="input"
+            style={{ paddingLeft: '2.375rem' }}
+          />
         </div>
 
         {/* Bookmarks */}
         {loading ? (
-          <div className="flex justify-center py-24">
-            <div className="w-9 h-9 rounded-full border-2 animate-spin"
-              style={{ borderColor: 'rgba(99,102,241,0.2)', borderTopColor: color }} />
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '5rem 0' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '3px solid #334155', borderTopColor: color, animation: 'spin 0.8s linear infinite' }} />
           </div>
         ) : bookmarks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
-              style={{ background: color + '15', border: `1px solid ${color}30` }}>🔗</div>
-            <div>
-              <p className="text-white font-semibold text-lg">{search ? 'No results' : 'No links yet'}</p>
-              <p className="text-slate-500 text-sm mt-1">{search ? 'Try a different search' : 'Add your first link above'}</p>
-            </div>
+          <div style={{ textAlign: 'center', padding: '5rem 0' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔗</div>
+            <p style={{ color: '#f1f5f9', fontWeight: 600, fontSize: '1.125rem' }}>
+              {search ? 'No results' : 'No links yet'}
+            </p>
+            <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+              {search ? 'Try a different search' : 'Add your first link above'}
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
             {bookmarks.map(b => <BookmarkCard key={b._id} bookmark={b} color={color} />)}
           </div>
         )}
       </div>
 
       {/* Mobile FAB */}
-      <button onClick={() => setShowForm(true)}
-        className="sm:hidden fixed bottom-5 right-5 w-14 h-14 rounded-2xl text-white text-2xl flex items-center justify-center z-50 active:scale-95"
-        style={{ background: color, boxShadow: `0 8px 24px ${color}60` }}>+</button>
+      <button
+        className="mobile-fab"
+        onClick={() => setShowForm(true)}
+        style={{
+          position: 'fixed', bottom: '1.5rem', right: '1.5rem',
+          width: '52px', height: '52px', borderRadius: '14px',
+          background: color, border: 'none', color: '#fff',
+          fontSize: '1.5rem', cursor: 'pointer',
+          alignItems: 'center', justifyContent: 'center',
+          zIndex: 50, boxShadow: `0 8px 24px ${color}60`,
+          fontFamily: 'inherit',
+        }}
+      >+</button>
     </div>
   );
 }

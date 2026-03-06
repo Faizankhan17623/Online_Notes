@@ -3,7 +3,75 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchSections, addSection, deleteSection } from '../store/sectionSlice';
 
-const COLORS = ['#4f46e5','#7c3aed','#db2777','#e11d48','#ea580c','#ca8a04','#059669','#0891b2','#0d9488'];
+const COLORS = ['#6366f1','#7c3aed','#db2777','#e11d48','#ea580c','#ca8a04','#059669','#0891b2','#0d9488'];
+
+function SectionCard({ section, onNavigate, onDelete }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div
+      onClick={onNavigate}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        background: '#1e293b',
+        border: `1px solid ${hovered ? section.color : '#334155'}`,
+        borderRadius: '10px',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        transition: 'border-color 0.2s, transform 0.15s',
+        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
+        boxShadow: hovered ? '0 8px 24px rgba(0,0,0,0.3)' : 'none',
+      }}
+    >
+      {/* Color bar */}
+      <div style={{ height: '4px', background: section.color }} />
+
+      <div style={{ padding: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '0.875rem' }}>
+          <div style={{
+            width: '40px', height: '40px', borderRadius: '10px',
+            background: section.color + '22', border: `1px solid ${section.color}44`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontWeight: 700, color: section.color, fontSize: '1.1rem', flexShrink: 0,
+          }}>
+            {section.name[0].toUpperCase()}
+          </div>
+          {hovered && (
+            <button
+              onClick={onDelete}
+              style={{
+                width: '28px', height: '28px', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', background: 'rgba(239,68,68,0.1)',
+                border: '1px solid rgba(239,68,68,0.25)', borderRadius: '6px',
+                cursor: 'pointer', fontSize: '0.8rem',
+              }}
+            >🗑️</button>
+          )}
+        </div>
+
+        <h3 style={{ color: '#f1f5f9', fontWeight: 600, fontSize: '1rem', marginBottom: '0.375rem' }}>
+          {section.name}
+        </h3>
+        {section.description && (
+          <p style={{ color: '#64748b', fontSize: '0.8rem', lineHeight: 1.5, marginBottom: '0.75rem',
+            overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+            {section.description}
+          </p>
+        )}
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.875rem', paddingTop: '0.875rem', borderTop: '1px solid #334155' }}>
+          <span style={{ color: section.color, fontSize: '0.8rem', fontWeight: 500 }}>
+            {section.subsectionCount} subsection{section.subsectionCount !== 1 ? 's' : ''}
+          </span>
+          <span style={{ color: '#475569', fontSize: '0.8rem' }}>·</span>
+          <span style={{ color: '#64748b', fontSize: '0.8rem' }}>
+            {section.bookmarkCount} link{section.bookmarkCount !== 1 ? 's' : ''}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Dashboard() {
   const dispatch = useDispatch();
@@ -12,7 +80,7 @@ export default function Dashboard() {
   const { token } = useSelector((s) => s.auth);
 
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: '', description: '', color: '#4f46e5' });
+  const [form, setForm] = useState({ name: '', description: '', color: '#6366f1' });
 
   useEffect(() => {
     if (!token) { navigate('/login'); return; }
@@ -23,7 +91,7 @@ export default function Dashboard() {
     e.preventDefault();
     if (!form.name.trim()) return;
     await dispatch(addSection(form));
-    setForm({ name: '', description: '', color: '#4f46e5' });
+    setForm({ name: '', description: '', color: '#6366f1' });
     setShowForm(false);
   };
 
@@ -33,53 +101,80 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden" style={{ background: '#070d1a' }}>
-      <div className="bg-orb w-96 h-96" style={{ background: 'rgba(79,70,229,0.12)', top: '-80px', right: '-80px' }} />
-      <div className="bg-orb w-72 h-72" style={{ background: 'rgba(124,58,237,0.08)', bottom: '0', left: '-40px' }} />
-
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+    <div style={{ minHeight: 'calc(100vh - 56px)', background: '#0f172a', padding: '2rem 1.5rem' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 sm:mb-8">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem' }}>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white">My Vault</h1>
-            <p className="text-slate-500 text-sm mt-0.5">{sections.length} section{sections.length !== 1 ? 's' : ''}</p>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#f1f5f9' }}>My Vault</h1>
+            <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+              {sections.length} section{sections.length !== 1 ? 's' : ''}
+            </p>
           </div>
-          <button onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all hover:-translate-y-0.5"
-            style={{ background: 'linear-gradient(135deg,#4f46e5,#7c3aed)', boxShadow: '0 4px 16px rgba(99,102,241,0.3)' }}>
+          <button
+            onClick={() => setShowForm(true)}
+            style={{
+              padding: '0.5rem 1.125rem',
+              background: '#6366f1',
+              border: 'none',
+              borderRadius: '8px',
+              color: '#fff',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              boxShadow: '0 4px 12px rgba(99,102,241,0.35)',
+            }}
+          >
             + New Section
           </button>
         </div>
 
         {/* Create section form */}
         {showForm && (
-          <div className="glass-card p-5 mb-6" style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
-            <h3 className="text-white font-semibold mb-4">Create New Section</h3>
-            <form onSubmit={handleCreate} className="flex flex-col gap-3">
-              <input className="input" placeholder="Section name (e.g. Machine Learning)" value={form.name}
-                onChange={e => setForm({ ...form, name: e.target.value })} required autoFocus />
-              <input className="input" placeholder="Description (optional)" value={form.description}
-                onChange={e => setForm({ ...form, description: e.target.value })} />
-              <div>
-                <p className="text-slate-500 text-xs mb-2">Pick a color</p>
-                <div className="flex gap-2 flex-wrap">
+          <div className="card" style={{ padding: '1.5rem', marginBottom: '1.75rem' }}>
+            <h3 style={{ color: '#f1f5f9', fontWeight: 600, fontSize: '1rem', marginBottom: '1rem' }}>
+              Create New Section
+            </h3>
+            <form onSubmit={handleCreate}>
+              <div style={{ marginBottom: '0.75rem' }}>
+                <input className="input" placeholder="Section name (e.g. Machine Learning)" value={form.name}
+                  onChange={e => setForm({ ...form, name: e.target.value })} required autoFocus />
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <input className="input" placeholder="Description (optional)" value={form.description}
+                  onChange={e => setForm({ ...form, description: e.target.value })} />
+              </div>
+              <div style={{ marginBottom: '1.25rem' }}>
+                <p style={{ color: '#64748b', fontSize: '0.8rem', marginBottom: '0.625rem' }}>Pick a color</p>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   {COLORS.map(c => (
-                    <button key={c} type="button" onClick={() => setForm({ ...form, color: c })}
-                      className="w-7 h-7 rounded-full transition-transform hover:scale-110"
-                      style={{ background: c, outline: form.color === c ? `3px solid ${c}` : 'none', outlineOffset: '2px' }} />
+                    <button
+                      key={c} type="button" onClick={() => setForm({ ...form, color: c })}
+                      style={{
+                        width: '28px', height: '28px', borderRadius: '50%',
+                        background: c, border: 'none', cursor: 'pointer',
+                        outline: form.color === c ? `3px solid ${c}` : '3px solid transparent',
+                        outlineOffset: '2px',
+                      }}
+                    />
                   ))}
                 </div>
               </div>
-              <div className="flex gap-2 mt-1">
-                <button type="submit"
-                  className="flex-1 text-white text-sm font-semibold py-2.5 rounded-xl transition-opacity hover:opacity-90"
-                  style={{ background: 'linear-gradient(135deg,#4f46e5,#7c3aed)' }}>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button type="submit" style={{
+                  flex: 1, padding: '0.6rem', background: form.color, border: 'none',
+                  borderRadius: '6px', color: '#fff', fontSize: '0.875rem',
+                  fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                }}>
                   Create Section
                 </button>
-                <button type="button" onClick={() => setShowForm(false)}
-                  className="flex-1 text-slate-400 text-sm py-2.5 rounded-xl transition-colors hover:text-white"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <button type="button" onClick={() => setShowForm(false)} style={{
+                  flex: 1, padding: '0.6rem', background: '#0f172a',
+                  border: '1px solid #334155', borderRadius: '6px',
+                  color: '#94a3b8', fontSize: '0.875rem', cursor: 'pointer', fontFamily: 'inherit',
+                }}>
                   Cancel
                 </button>
               </div>
@@ -87,58 +182,32 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Sections grid */}
+        {/* Grid */}
         {loading ? (
-          <div className="flex justify-center py-24">
-            <div className="w-9 h-9 rounded-full border-2 animate-spin"
-              style={{ borderColor: 'rgba(99,102,241,0.2)', borderTopColor: '#6366f1' }} />
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '5rem 0' }}>
+            <div style={{
+              width: '36px', height: '36px', borderRadius: '50%',
+              border: '3px solid #334155', borderTopColor: '#6366f1',
+              animation: 'spin 0.8s linear infinite',
+            }} />
           </div>
         ) : sections.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
-              style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)' }}>📚</div>
-            <div>
-              <p className="text-white font-semibold text-lg">No sections yet</p>
-              <p className="text-slate-500 text-sm mt-1">Create a section to start organising your links</p>
-            </div>
+          <div style={{ textAlign: 'center', padding: '5rem 0' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📚</div>
+            <p style={{ color: '#f1f5f9', fontWeight: 600, fontSize: '1.125rem' }}>No sections yet</p>
+            <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+              Create your first section to start organising links
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
             {sections.map(section => (
-              <div key={section._id} onClick={() => navigate(`/section/${section._id}`)}
-                className="cursor-pointer rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl group"
-                style={{ background: 'rgba(15,23,42,0.75)', border: '1px solid rgba(148,163,184,0.1)', boxShadow: '0 2px 12px rgba(0,0,0,0.3)' }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = section.color + '60'}
-                onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(148,163,184,0.1)'}>
-
-                {/* Top color bar */}
-                <div style={{ height: '4px', background: section.color }} />
-
-                <div className="p-5">
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold text-white shrink-0"
-                      style={{ background: section.color + '25', border: `1px solid ${section.color}40` }}>
-                      {section.name[0].toUpperCase()}
-                    </div>
-                    <button onClick={(e) => handleDelete(e, section._id)}
-                      className="w-7 h-7 flex items-center justify-center rounded-lg text-xs opacity-0 group-hover:opacity-100 transition-all text-slate-500 hover:text-red-400"
-                      style={{ background: 'rgba(255,255,255,0.05)' }}>🗑️</button>
-                  </div>
-
-                  <h3 className="text-white font-semibold text-base mb-1 leading-tight">{section.name}</h3>
-                  {section.description && (
-                    <p className="text-slate-500 text-xs mb-3 line-clamp-2">{section.description}</p>
-                  )}
-
-                  <div className="flex items-center gap-3 mt-3 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                    <span className="text-xs" style={{ color: section.color }}>
-                      {section.subsectionCount} subsection{section.subsectionCount !== 1 ? 's' : ''}
-                    </span>
-                    <span className="text-slate-600 text-xs">·</span>
-                    <span className="text-slate-500 text-xs">{section.bookmarkCount} link{section.bookmarkCount !== 1 ? 's' : ''}</span>
-                  </div>
-                </div>
-              </div>
+              <SectionCard
+                key={section._id}
+                section={section}
+                onNavigate={() => navigate(`/section/${section._id}`)}
+                onDelete={(e) => handleDelete(e, section._id)}
+              />
             ))}
           </div>
         )}

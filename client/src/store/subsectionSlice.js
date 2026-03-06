@@ -35,7 +35,7 @@ const subsectionSlice = createSlice({
   reducers: { clearSubsections(state) { state.subsections = []; } },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchSubsections.pending, (s) => { s.loading = true; })
+      .addCase(fetchSubsections.pending, (s) => { s.loading = true; s.error = null; s.subsections = []; })
       .addCase(fetchSubsections.fulfilled, (s, a) => { s.loading = false; s.subsections = a.payload; })
       .addCase(fetchSubsections.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
       .addCase(addSubsection.fulfilled, (s, a) => { s.subsections.unshift(a.payload); })

@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 *, *::before, *::after {
@@ -8,102 +7,85 @@
 }
 
 html, body, #root {
-  height: 100%;
-  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100%;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
-  background-color: #070d1a;
-  color: white;
+  background: #0f172a;
+  color: #e2e8f0;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: #0d1526; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0f172a; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-/* ─── Custom reusable classes (plain CSS, no @apply) ─── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
 
+/* ── Input ── */
 .input {
+  display: block;
   width: 100%;
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.15);
-  color: #f1f5f9;
-  border-radius: 0.75rem;
-  padding: 0.75rem 1rem;
+  padding: 0.6rem 0.875rem;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #e2e8f0;
   font-size: 0.875rem;
   font-family: inherit;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
   -webkit-appearance: none;
   appearance: none;
 }
-
-.input::placeholder {
-  color: #475569;
-}
-
+.input::placeholder { color: #475569; }
 .input:focus {
-  outline: none;
-  border-color: rgba(99, 102, 241, 0.6);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
 }
+.input option { background: #1e293b; color: #e2e8f0; }
+textarea.input { resize: vertical; }
 
-.input option {
-  background: #0f172a;
-  color: #f1f5f9;
-}
-
-.glass-card {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: 1.25rem;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
+/* ── Buttons ── */
 .btn-primary {
+  display: block;
   width: 100%;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  color: white;
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.75rem;
+  padding: 0.65rem 1rem;
+  background: #6366f1;
   border: none;
-  cursor: pointer;
+  border-radius: 6px;
+  color: #fff;
   font-size: 0.875rem;
+  font-weight: 600;
   font-family: inherit;
-  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s;
+}
+.btn-primary:hover:not(:disabled) { background: #4f46e5; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Card ── */
+.card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
 }
 
-.btn-primary:hover:not(:disabled) {
-  opacity: 0.92;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.35);
-}
+/* ── Mobile FAB (hidden on desktop) ── */
+.mobile-fab { display: flex; }
+@media (min-width: 640px) { .mobile-fab { display: none; } }
 
-.btn-primary:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
+/* ── Tag ── */
 .tag-pill {
-  background: rgba(99, 102, 241, 0.1);
-  color: #a5b4fc;
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  font-size: 0.7rem;
-  padding: 0.2rem 0.6rem;
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  background: rgba(99,102,241,0.12);
+  border: 1px solid rgba(99,102,241,0.3);
   border-radius: 999px;
+  color: #a5b4fc;
+  font-size: 0.7rem;
   font-weight: 500;
-}
-
-/* Background orbs */
-.bg-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-  z-index: 0;
 }
