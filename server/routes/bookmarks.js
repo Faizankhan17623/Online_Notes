@@ -6,12 +6,19 @@ const router = express.Router();
 router.use(protect);
 
 // GET /api/bookmarks?subsectionId=xxx&search=xxx
+// GET /api/bookmarks?direct=true&search=xxx
 router.get('/', async (req, res) => {
   try {
-    const { subsectionId, search } = req.query;
-    if (!subsectionId) return res.status(400).json({ success: false, message: 'subsectionId is required' });
+    const { subsectionId, search, direct } = req.query;
 
-    const query = { subsectionId, userId: req.user._id };
+    let query = { userId: req.user._id };
+
+    if (direct === 'true') {
+      query.direct = true;
+    } else {
+      if (!subsectionId) return res.status(400).json({ success: false, message: 'subsectionId is required' });
+      query.subsectionId = subsectionId;
+    }
 
     if (search) {
       query.$or = [
@@ -31,13 +38,19 @@ router.get('/', async (req, res) => {
 // POST /api/bookmarks
 router.post('/', async (req, res) => {
   try {
-    const { title, url, description, tags, sectionId, subsectionId } = req.body;
-    if (!title || !url || !sectionId || !subsectionId)
-      return res.status(400).json({ success: false, message: 'title, url, sectionId and subsectionId are required' });
+    const { title, url, description, tags, sectionId, subsectionId, direct } = req.body;
+    if (!title || !url)
+      return res.status(400).json({ success: false, message: 'title and url are required' });
+
+    if (!direct && (!sectionId || !subsectionId))
+      return res.status(400).json({ success: false, message: 'sectionId and subsectionId are required for section links' });
 
     const bookmark = await Bookmark.create({
       title, url, description, tags: tags || [],
-      sectionId, subsectionId, userId: req.user._id,
+      ...(sectionId && { sectionId }),
+      ...(subsectionId && { subsectionId }),
+      userId: req.user._id,
+      direct: !!direct,
     });
     res.status(201).json({ success: true, data: bookmark });
   } catch (error) {
